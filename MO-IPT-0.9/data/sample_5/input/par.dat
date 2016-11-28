@@ -1,0 +1,14 @@
+0.1  1.E-8  0.01 0.6  0.5  0.001 
+2.5 1.2 0.001 0.02
+1.5 0.0 0.2 1.0 0.00 1.0 0.0 0
+1 0  1  4 0
+0.00 0.0 0.006 
+4 60 0 2
+
+
+ b1,ep1,ep2,b2,db2,ep3
+ b3,db3,ep4,ep5
+ U, J_H, dfac,correc,correc2,t,alpha,Jflag
+Half_fill,LDA_DMFT, init, idos,uniform_grid
+ temp,frac, eta
+ Norbs Nkp NQPTS Ndim

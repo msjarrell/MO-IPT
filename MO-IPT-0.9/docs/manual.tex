@@ -1,0 +1,384 @@
+\documentclass[a4paper]{article}
+\usepackage[affil-it]{authblk}
+\usepackage{graphicx}
+%\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{setspace}
+\topmargin=-1.0in
+%\rightmargin=-1.0in
+%\leftmargin=0.4in
+%\setlength{\textheight}{9.9in}
+%\setstretch{0.9}
+%\setlength{\textwidth}{6.3in}
+%\usepackage[margin=0.8in]{geometry}
+
+
+\begin{document}
+
+\title{\bf User-guide for MO-IPT package.}
+\author{Wasim Raja Mondal}
+\author{Nagamalleswararao Dasari} 
+\author{N.\ S.\ Vidhyadhiraja}
+\affil{Theoretical Sciences Unit, \\ Jawaharlal Nehru Centre for Advanced Scientific
+Research, \\ Jakkur, Bangalore 560064, India.}
+\maketitle
+
+\section{Brief description}
+MO-IPT stands for multi-orbital iterated perturbation theory. The present code
+implements the MO-IPT solver as described in Dasari et al [paper reference] within
+the dynamical mean field theory (DMFT) framework and may be used to obtain single-
+-particle spectra and self-energies for strongly correlated model Hamiltonians as
+well as real materials with multiple orbital degrees of freedom. The code is implemented
+for zero as well as finite temperatures. The impurity solver uses the second-order
+self-energy in an ansatz motivated by the continued fraction expansion of the self-
+-energy. The ansatz has certain free parameters that are chosen to satisfy high
+frequency and the atomic limits. Since the ansatz reproduces low frequency Fermi liquid
+behaviour and the band limit by construction, the MO-IPT is expected to be a reasonable
+interpolating approximation. Naturally, the MO-IPT cannot be expected to be accurate
+close to phase transitions, etc, where exact methods such as QMC and NRG would be
+far more accurate. For extensive benchmarking of the method with continuous time
+Monte Carlo and other methods, please see Dasari et al [paper reference]. The main
+limitation of the code is that the Hund's coupling is presently considered only as
+a density-density interaction. The main merits of the MO-IPT is that it is fast,
+numerically inexpensive, can deal with many orbitals, and provides real frequency
+results at zero and finite temperature. The main motivation of our implementation
+is to carry out first principles calculations of strongly correlated materials, so
+the integration with band structure results (from e.g WIEN2K) is also implemented
+in this set of codes.
+
+
+\section{Quick build and execution}
+
+\begin{itemize}
+\item{cd MO-IPT/src; make clean}
+\item{make}
+\item{cd ..; chmod 755 run.sh; ./run.sh} 
+\end{itemize}
+
+This is an interactive script.  There are five sample data sets. For the 1$^{\rm st}$
+and 2$^{\rm nd}$ data sets, the number of recommended MPI processes, $np$, is one, while for
+the rest, some speedup is achieved by $np > 1$. 
+
+\section{Directory Structure}
+\text{The package has the following directory structure:}
+\begin{description}
+\item [README]
+\item [COPYRIGHT.txt]  
+\item [docs/] Documentation
+\begin{itemize}
+\item manual.pdf  $ $  $ $  // Detailed instructions and guide
+\item flowchart.pdf $ $ $ $ // Flowchart for MO-IPT
+\end{itemize}
+\item [data/] Example calculations. Each sample set has an {\tt input/} and an 
+{\tt output/}
+subdirectory.
+\begin{itemize}
+\item sample\_1/ and sample\_2/ $  $ // Examples for model Hamiltonian calculations with toy density of states
+\item sample\_3/ and sample\_4/ $ $ // Examples for real material calculations
+\item sample\_5/ // Example for a model Hamiltonian calculation on a 
+2-D square lattice
+\end{itemize} 
+\item [src/] Source files
+\begin{itemize}
+\item Makefile
+\item main.f90  $ $ $ $ // Main program for MO-IPT calculation, DMFT iterations, self-energy calculation etc.
+\item makegrid.f90 $ $ $  $ // Module for creating real frequency (energy) grids.
+\item ksum.f90     $ $ $ $ // Module for momentum summation and constructing local Green's functions.
+\item funct.f $ $ $ $ // Collection of auxiliary modules like Fermi function, Hilbert
+transform, interpolation, root finder etc. 
+\item Glob\_cons   $ $ $ $ // Global constants.
+\end{itemize}
+\end{description}
+
+\section{Input/Output description}
+
+\textbf {The input files are described below:}
+
+\begin{itemize}
+\item {par.dat}
+\text{This is the most important input file for MO-IPT calculations. The structure of this file is given below}\\
+\\
+\text{$b_1$ $ $ $\epsilon_1$ $ $  $\epsilon_2$ $ $ $b_2$ $ $ $db_2$ $ $ $\epsilon_3$} \;
+\;\;\;\; Grid parameters \\
+\\
+\text{$b_3$ $ $ $db_3$ $ $ $\epsilon_4$ $ $ $\epsilon_5$} \;\;\;\;\;\;\;\;\;\;\;\;
+\;\;\;\;\;Grid parameters\\
+\\
+\text{$U$ $ $ $J_H$ $ $ $dfac$ $ $ $correc$ $ $ $correc2$ $ $ $t$ $ $ $\alpha$ $ $ $Jflag$}\\
+\\
+\text{$phsym$ $ $ $LDA\_DMFT$ $ $ $init$ $ $ $idos$ $ $ $uniform\_grid$}\\
+\\
+\text{$temp$ $ $ $frac$ $ $ $eta$} \\
+\\
+\text{$Norbs$ $ $ $Nkp$ $ $ $NQPTS$ $ $ $Ndim$}
+\end{itemize}
+
+\subsection{Input parameter description}
+ \begin{description}
+ 
+  \item The first two lines define an inhomogeneous frequency or energy grid, and are used in
+  makegrid.f90. 
+  \item [$U$:] represents local Coloumb repulsion (Hubbard - U).
+  \item [$J_H$:] stands for Ising type Hund's coupling.
+  \item [$dfac$:] This is mixing parameter between old and new solutions, and is used
+  for smoother convergence.
+  \item [$correc$, $correc2$ :] These parameters are mixing fractions for two particle correlation (2PC) and three particle correlation (3PC) functions. So if $correc=0.3$,
+  then only 0.3 of the 2PC function enters the calculations. It is advised to keep
+  $correc$ small for initial calculations and increase them gradually using converged data for lower $correc$ parameters. 
+  \item [$t$:] Bare hopping integral for model calculations and in general is the unit of energy.
+  \item [$Jflag$:] This flag decides the format of $U-J$ matrix.
+ 
+ \item[$phsym$:] This flag can be used to enforce particle-hole symmetry. If $phsym=0$,
+ then the chemical potential is tuned to get the fixed total occupancy, else if
+ $phsym=1$, the occupancy of each orbital is fixed at $0.5$ and the $\mu$ is set
+ to zero. 
+
+\item[$LDA\_DMFT$:] If $idos > 3$, then two options are available using the
+$LDA\_DMFT$ flag. If this flag is set to 1, then DMFT calculations will be carried out for a DFT-calculated $H_0(k)$. So an input file names HK\_data will be expected.
+The number of Q-points used for the DFT calculation also need to be specified in the
+$NQPTS$ variable (see below). For other values of $LDA\_DMFT$ (and $idos \ge 4$),
+the model calculations with real density of states (2-D square or 3-D cubic) 
+are carried out. The dimensionality $Ndim$ needs to be specified in this case.
+
+
+
+  \item [$init$:] init=0 means - start a fresh calculation and no previous data is available. init=1 means supply previously computed data as input.
+
+  \item [$idos$:] Flag for choice of non-interacting density of states.
+  
+                 idos=1 : Hypercubic lattice, Gaussian Density of states. 
+                  
+                  idos=2 : Bethe lattice or Cayley tree, semicircular density of states. 
+                  
+                  idos=3 : General (user supplied) density of states. 
+                  
+                  idos=4 : Real material calculations using LDA Tight - Binding input OR
+                           model calculations on a 2D square/3D cubic lattice. 
+
+\item [$uniform\_grid$:] If this flag is set to 1, then a homogeneous $\omega$-grid
+is created, else a logarithmic+homogeneous grid is generated.
+
+  \item [$temp$:] Temperature in units of $t$ for model calculations or in eV when doing
+  real-material calculations. 
+  \item [$frac$:] Set default value as 0.
+  \item [$eta$:] Defines appropriate contour in the complex plane. It should be positive and typical value is of the order of $10^{-4}$.   
+\item [$Norbs$:] is the total number of orbitals (including spin degeneracy). If $N$ is the
+ number of orbitals you are interested, then $Norbs$ will take value $2N$. The factor $2$ is
+  because each orbital is considered to have two spin indices ($\uparrow$ or $\downarrow$).
+\item [$Nkp$:] is the total number of k-points from 0 to $\pi$, and is made use of to generate
+a k-point mesh for real lattice calculations (with idos=4, LDA\_DMFT=0, Ndim=2 or 3). The default
+value is 0.
+
+\item [$NQPTS$:] The total number of K-points in the $H_0(k)$ produced by the DFT.  For example,
+in the sample\_3 and sample\_4, the DFT was carried out using a $25\times25\times$ K-point mesh, hence
+the $H_0(k)$ contains 15625 entries, and thus NQPTS=15625. This parameter is used only when
+doing real-material calculations (idos=4, LDA\_DMFT=1). The default value is 0.
+
+\item [$Ndim$:] The dimensionality of the lattice. This parameter is used in conjunction with
+ $Nkp$ when model calculations need to be performed on realistic 2D square or 3D cubic lattices.
+ For these $Ndim=2$ or $3$ respectively must be specified. See also the description for
+ $LDA\_DMFT$ above.
+
+ \end{description}
+
+
+
+\begin{itemize}
+\item initials.dat: This is another input file that contains initial occupancies and
+chemical potentials. The structure of the file is given below:\\
+\text{$n_{1\uparrow}$}\\
+\text{$n_{1\downarrow}$}\\
+\text{$n_{2\uparrow}$}\\
+\text{$n_{2\downarrow}$}\\
+\text{.}\\
+\text{.}\\
+\text{.}\\
+\text{.}\\
+\text{.}\\
+\text{.}\\
+\text{.}\\
+\text{$n_{N\uparrow}$}\\
+\text{$n_{N\downarrow}$}\\
+\text{$\mu_{guess}$, $\mu_{0\,guess}$, $Fermi Level (DFT)$}\\
+\text {$ntotinput$}
+\end{itemize}
+
+\begin{description}
+\item [$occupancies$]: $n_{r\uparrow}$ is the occupancy of the r$^{\rm th}$  orbital for up spin and $n_{r\downarrow}$ is the occupancy of the r$^{\rm th}$ orbital for down spin.
+\item [$\mu_{guess}$]: User-provided guess value of $\mu$ so that total occupancy constraint is satisfied. The code finds appropriate $\mu$ given a fixed total occupancy, $n_{tot}$.
+\item [$\mu_{0\, guess}$]: User-provided guess pseudo-chemical potential for satisfying 
+Luttinger's Theorem (LT). The code does not modify this automatically, and at present a manual
+tuning of $\mu_0$ is required to satisfy the LT.
+\item [$Fermi Level (DFT)$]: For real material calculations, it is the Fermi energy calculated by DFT.
+\item [$ntotinput$] Total occupancy of all the orbitals considered in the calculation.
+This is a fixed number for a given calculation.
+\end{description}
+
+
+
+\begin{itemize}
+\item{HK\_data}\\
+
+This input file represents a non-interacting Hamiltonian matrix in the orbitals
+basis for several momentum values. Mathematically, this is denoted as $H_0({\mathbf{k}})$. This input is needed when $idos=4$ and $LDA_DMFT=1$.
+which is the combination appropriate for first principles based real material calculations and
+is derived from DFT calculations followed by downfolding. The structure of this input file is given below:
+\begin{equation}
+H_{0}(k) =
+\begin{pmatrix}
+P_n(k_1) \\
+P_n(k_2) \\
+\vdots \\
+\vdots \\
+P_n(k_{NQPTS})
+\end{pmatrix}
+\end{equation}
+
+where each of the $P_n(k)$ are one-dimensional column vectors given by 
+\begin{equation}
+P_{n}(k) =
+ \begin{pmatrix}
+H_{1\uparrow,1\uparrow}(k) \\ H_{1\uparrow,1\downarrow}(k)\\ H_{1\uparrow,2\uparrow}(k)\\ H_{1\uparrow,2\downarrow}(k) \\ \cdots \\ H_{1\uparrow,n\uparrow} \\ H_{1\uparrow,n\downarrow} \\
+H_{1\downarrow,1\uparrow}(k) \\ H_{1\downarrow,1\downarrow}(k)\\ H_{1\downarrow,2\uparrow}(k) \\ H_{1\downarrow,2\downarrow}(k) \\ \cdots \\ H_{1\downarrow,n\uparrow} \\ H_{1\downarrow,n\downarrow} \\
+  \vdots  \\ \vdots  \\
+H_{n\uparrow,1\uparrow}(k) \\ H_{n\uparrow,1\downarrow}(k)\\    H_{n\uparrow,2\uparrow}(k)\\ H_{n\uparrow,2\downarrow}(k)\\ \cdots \\ H_{n\uparrow,n\uparrow} \\ H_{n\uparrow,n\downarrow} \\
+H_{n\downarrow,1\uparrow}(k) \\ H_{n\downarrow,1\downarrow}(k) \\ H_{n\downarrow,2\uparrow}(k) \\   H_{n\downarrow,2\downarrow}(k) \\ \cdots \\ H_{n\downarrow,n\uparrow} \\ H_{n\downarrow,n\downarrow} 
+\end{pmatrix}
+\end{equation}
+\end{itemize}
+
+
+
+\textbf{The following are the main output files:}
+
+\begin{itemize}
+\item{Green's functions}
+
+The computed Green's functions are written in Gf1.dat for the 1$^{\rm st}$ orbital,
+spin $\uparrow$,
+Gf2.dat for the 1$^{\rm st}$ orbital, spin $\downarrow$, Gf3.dat for the 2$^{\rm nd}$ orbital, spin $\uparrow$, and so on.
+
+In each file there are three columns. The first column is frequency, the second is
+the positive definite spectral function and the third column is the real part of the Green's function.
+
+\item{Self energy}
+
+The calculated self-energies are written in sig1up.dat file for the 1$^{\rm st}$ orbital,
+ up spin and sig1down.dat file for the 1$^{\rm st}$ orbital, down spin. And
+similarly for the 2$^{\rm nd}$ orbital, sig2up.dat and sig2down.dat files contain
+self-energies for up and down spins respectively. In each file, frequency is in the 1st column, imaginary part of the self-energy is in the second column and real part of the self energy is 
+in the third column.
+
+\item{quasiwei.dat}
+
+Calculated quasi-particle weights are written in this file.
+
+\item interaction matrix.dat
+
+The interaction matrix is written in this file.
+
+
+\item Mastubara\_self.dat
+
+The self-energies computed on the real frequency axis are Fourier transformed
+to Matsubara frequencies and then written to this file. The first column is
+the $\omega_n=(2n+1)\pi T$, where $T$ is the temperature, and the rest of the columns
+are imaginary parts of the up-spin self-energies of the orbitals, i.e
+Im($\Sigma_{1\uparrow}(i\omega_n))$, Im($\Sigma_{2\uparrow}(i\omega_n))$
+and so on. Currently $n\in [-300:300]$.
+
+
+\item Mastubara\_green.dat 
+
+The Green's functions computed on the real frequency axis are Fourier transformed
+to Matsubara frequencies and then written to this file. The format is similar to the self-energy file above, except that the self-energy is replaced by the corresponding Green's function.
+
+\end{itemize}
+
+
+\section{System information}
+The codes have been tested on the following system configurations:
+
+\begin{itemize}
+\item{Ubuntu on Intel Xeon Hex-core E5645 (2.4GHz) with 12GB RAM}
+\begin{itemize}
+\item{\tt uname -a}
+\begin{description}
+\item Linux 3.2.0-23-generic $36$ -Ubuntu SMP Tue Apr 10 20:39:51 UTC 2012 x86\_64 x86\_64 x86\_64 GNU/Linux
+\end{description} 
+\item{\tt lsb\_release -a}
+\begin{description}
+\item DISTRIB ID=Ubuntu
+\item DISTRIB RELEASE = $12.04$
+\item DISTRIB CODENAME=precise
+\item DISTRIB DESCRIPTION= Ubuntu 12.04.4 LTS 
+\end{description}
+
+\item{\tt mpif90 -v}
+
+mpif90 for MPICH version 3.0.3
+
+ifort version 13.0.0
+\end{itemize}
+
+\item{Mageia on Intel Core i7-4765T (2GHz) with 8GB RAM }
+\begin{itemize}
+\item{\tt uname -a}
+\begin{description}
+\item Linux 3.10.28-desktop-1.mga3 \#1 SMP Sat Feb 1 16:15:10 UTC 2014 x86\_64 x86\_64 x86\_64 GNU/Linux
+\end{description} 
+\item{\tt lsb\_release -a}
+\begin{description}
+\item Distributor ID: Mageia
+\item Description:    Mageia 3
+\item Release:        3
+\item Codename:       thornicroft
+\end{description}
+
+\item{\tt mpif90 -v}
+
+mpif90 for MPICH2 version 1.2.1
+
+ifort version 14.0.1
+
+
+\end{itemize}
+
+\end{itemize}
+
+\section{Examples}
+
+These examples are located in {\tt MO-IPT/data/}.
+\begin{itemize}
+
+
+\item{\bf sample\_1:} Model calculation of the doped two-orbital degenerate Hubbard Model for density-density type interaction
+at $T=0$. The $U=1.5$, $J_H=0$, and the total filling, $n_{tot}=1.6$. The bare
+density of states is a Gaussian (Hypercubic lattice). The relevant files are in
+{\tt data/sample\_1}.
+
+\item{\bf sample\_2:} Model calculation of the half-filled non-degenerate two-orbital Hubbard model for density-density type interactions. The system is half-filled 
+($n_{tot}=2$) but not p-h symmetric. The $U=1.5$ and $J_H=0$. The relevant files are in
+{\tt data/sample\_2}.
+
+\item{\bf sample\_3:} Real material calculation for SrVO$_3$ at $T=0$. The DFT input, $H_0(k)$, has been obtained through WIEN2K and Wannier90 through standard procedures.
+The $U=1.2$ and $J_H=0.1$. The relevant files are in
+{\tt data/sample\_3}.
+
+\item{\bf sample\_4:} Real material calculation for SrVO$_3$ at $T=0.1 eV$. The DFT input, $H_0(k)$, has been obtained through WIEN2K and Wannier90 through standard procedures.
+The relevant files are in
+{\tt data/sample\_4}.
+
+\item{\bf sample\_5:} Model calculation of the half-filled, p-h symmetric 
+two-orbital Hubbard model at $U=1.5$, and $J_H=0$ on a 2-D square lattice
+with 120 k-points along each direction.
+The relevant files are in
+{\tt data/sample\_5}.
+\end{itemize}
+
+\section{Flowchart}
+
+The full flowchart of the LDA+DMFT method is displayed in {\tt docs/flowchart.pdf}. A description of the symbols may be found in 
+Dasari et al [].
+
+\end{document}

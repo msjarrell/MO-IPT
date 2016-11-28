@@ -1,0 +1,77 @@
+               LA-SiGMA APPLICATION LICENSE version 1.0
+ Copyright (C) 2014 Louisiana State University. All rights reserved.
+
+This license is derived from the ALPS APPLICATION LICENSE version 1.0,
+Copyright (C) 2003-2004 Ian McCulloch.
+
+Everyone is permitted to copy and distribute this license document.
+
+This License applies to any software containing a notice placed by the
+copyright holder saying that it may be distributed under the terms of
+the LA-SiGMA Application License version 1.0. Such software is herein
+referred to as the "Software".
+
+This license grants permission to use, reproduce, display, distribute,
+execute and transmit the Software, and to prepare derivative works of
+the Software, and to permit others to do so for non-commercial
+academic use, all subject to the following conditions:
+
+1. In any academic publication based wholly or in part on the
+Software, the use of the Software must be acknowledged as set forth in
+the file CITATION.txt, this may include a list of publications to be
+cited.
+
+2. You may copy and distribute verbatim copies of the Software in the
+form that you received it, as long as all copyright notices and
+references to this license and warranty disclaimer are kept intact,
+and all recipients also receive a copy of this license and warranty
+disclaimer.
+
+3. You may modify your copy or copies of the Software, thus forming a
+work based on the Software, and use, copy or distribute such modified
+works under the terms of sections 1 and 2 above, provided that you
+also meet all of these conditions:
+
+    a. For each modified file a notice must be placed either in the
+    file itself (if the format so allows) or in a separate file. A
+    notice placed in a modified file shall read: "This file is based
+    on LA-SiGMA PACKAGE_NAME VERSION." with PACKAGE_NAME and VERSION
+    replaced with the package name and version found in the README.txt
+    file. The wording shall be adjusted for notices placed in other
+    files, and for notices in renamed files and for files containing
+    copies of original LA-SiGMA code.
+
+    b. All citations listed in the accompanying CITATIONS.txt document
+    that refer to sections of the Software that exist in the modified
+    work must be preserved irrespective of the extent of the
+    modification.
+
+    c. You must cause any work that you distribute or publish, that in
+    whole or in part contains or is derived from the Software or any
+    part thereof, to be licensed as a whole at no charge to all third
+    parties under terms compatible with this License.
+
+    d. Text and other elements generated in the execution of the
+    Software which identify this Software must be modified so that
+    they read "Based on LA-SiGMA" followed by the name and version of
+    the original software and the original copyright notice. This may
+    be accompanied by text identifying the modified code.
+
+4. This Software, or modifications under section 3 above, may be
+distributed in object code or executable form, provided that you
+include this complete License, warranty disclaimer and accompanying
+CITATIONS.txt document.
+
+5. If you wish to incorporate parts of the Software into other
+programs whose distribution conditions are incompatible with these,
+please write to LA-SiGMA and ask for permission to use under a
+different license.
+
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, TITLE AND
+NON-INFRINGEMENT. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR ANYONE
+DISTRIBUTING THE SOFTWARE BE LIABLE FOR DAMAGES OR OTHER LIABILITY,
+WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING OUT OF OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

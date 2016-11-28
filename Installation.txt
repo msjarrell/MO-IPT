@@ -1,0 +1,19 @@
+ 
+Skills Needed
+These instructions, and the instructions included in the packages, are written for a person with a small amount of Unix/Linux command-line experience. Those who only have a small amount of Linux command-line experience should locate and remain on good terms with their local Unix/Linux guru, to avoid wasting hours on problems that can be fixed in seconds.
+Supported Hardware and Software
+All packages require some flavor of Unix, many packages have been tested on Red Hat Enterprise Linux (a flavor of Unix). See the README (release) file of the package you have chosen for specifics and for additional requirements.
+Download
+Download the package file using the download link on the package's main Web page. A list of packages can be found under the Release Packages menu on the sidebar. The name of the downloaded file will be something like XXX-YYY.tgz, where XXX is an abbreviated name of the package, and YYY is a version number.
+Unpack Downloaded File
+Unpack the file in a convenient place where you have write permission. The example commands below assume that you already have a directory named mysw, that the your browser downloads into a directory named Downloads, and that your home directory is /user/smith.
+ cd ~/mysw
+ tar -xpf /home/smith/Downloads/XXX-YYY.tgz
+Locate and Follow Package-Specific Instructions
+Every package has a README.txt in its root. Read that file for further instructions.
+ cd XXX-YYY
+ more README.txt &
+Getting Help
+Look for E-mail addresses of the package developers in the README.txt file. E-mail your request, and be sure to include the steps that you followed and what went wrong. Please include a session transcript (the commands and their output), and also include your operating system and other information that might help.
+Feedback and Code Contributions
+We welcome contributions of code, suggestions for improvements, etc.! Please visit LA-SiGMA Development Team Wiki to learn more about the different projects, and also E-mail participants.
